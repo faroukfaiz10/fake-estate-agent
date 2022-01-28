@@ -13,14 +13,13 @@ const haveSameElements = (arr1, arr2) => {
 
 const fetchData = async () => {
     const URL =
-        "https://trouverunlogement.lescrous.fr/tools/flow/21/search?bounds=2.1601_48.9661_2.5391_48.6926";
-    // const URL = "https://trouverunlogement.lescrous.fr/tools/flow/21/search?bounds=4.3781_46.2596_6.2622_42.8317"
+        "https://trouverunlogement.lescrous.fr/tools/flow/21/search?bounds=2.2431_48.9244_2.4345_48.7714";
     const browser = await puppeteer.launch();
     let last_residences_ids = [];
     setInterval(async () => {
         const page = await browser.newPage();
         await page.goto(URL);
-        await page.waitForSelector(".SearchResults-item");
+        await page.waitForSelector("#SearchResultsList");
         const unfilteredResidences = await page.$$eval(
             ".SearchResults-item",
             (results) => {
