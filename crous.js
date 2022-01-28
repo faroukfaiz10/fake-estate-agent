@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import { Utils } from "./utils.js";
 
 export class Crous {
@@ -68,8 +67,7 @@ export class Crous {
 
     async isResidenceAvailable(id) {
         const URL = `https://trouverunlogement.lescrous.fr/api/fr/tools/21/accommodations/${id}/availabilities?occupationMode=alone&arrivalDate=2022-01-29&departureDate=2022-08-31`;
-        const response = await fetch(URL);
-        const data = await response.json();
+        const data = await Utils.fetchJson(URL);
         return data.periodsAvailable.length != 0;
     }
 }

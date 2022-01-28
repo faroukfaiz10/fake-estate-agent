@@ -9,46 +9,45 @@
 
 // 5 - Replace {ID} in https://admin.arpej.fr/api/customer/residences/{ID}/availabilities/2022-01/offers with the id from step 4 to get the availabilities for that residence.
 
-import puppeteer from "puppeteer";
-import fetch from "node-fetch";
+import { Utils } from "./utils.js";
 
-const fetchJson = async (url, token) => {
-    const response = token
-        ? await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
-        : await fetch(url);
-    return await response.json();
-};
-
-const fetchArpej = async (/*browser*/) => {
-    const TOKEN =
-        "cbdd386fc36735d87184ee603b5b85f5526189f55a3ee3c3a42d740c421f54aa";
-    const GET_RESIDENCES_URL =
+export class Arpej {
+    TOKEN = "cbdd386fc36735d87184ee603b5b85f5526189f55a3ee3c3a42d740c421f54aa";
+    GET_RESIDENCES_URL =
         "https://www.arpej.fr/wp-json/sn/residences?lang=fr&display=map&related_city[]=52524&price_from=0&price_to=1000&show_if_full=false&show_if_colocations=false";
-    const RESERVATION_LINK_SELECTOR =
-        "a[href^='https://ibail.arpej.fr/residences/']";
+    RESERVATION_LINK_SELECTOR = "a[href^='https://ibail.arpej.fr/residences/']";
 
-
-    const data = await fetchJson(GET_RESIDENCES_URL);
-    const browser = await puppeteer.launch(); // TODO: Remove
-    const page = await browser.newPage();
-    for (const residence of data.residences) {
-        await page.goto(residence.link);
-        await page.waitForSelector(RESERVATION_LINK_SELECTOR);
-        const reservationLink = await page.$$eval(
-            RESERVATION_LINK_SELECTOR,
-            (links) => links[0].href
-        );
-        const splitLink = reservationLink.split("/");
-        const tmpId = splitLink[splitLink.length - 2]; // TODO: Maybe store it
-        const id = (await fetchJson(
-            `https://admin.arpej.fr/api/customer/residences/${tmpId}`,
-            TOKEN
-        )).id;
-
-        const offers = await fetchJson(`https://admin.arpej.fr/api/customer/residences/${id}/availabilities/2022-02/offers`, TOKEN);
-
-        console.log(`${offers.length} ${residence.title}`)
+    constructor(page, discordNotifier) {
+        this.page = page;
+        this.discordNotifier = discordNotifier;
     }
-};
 
-fetchArpej()
+    async fetch() {
+        const residences = (await Utils.fetchJson(this.GET_RESIDENCES_URL))
+            .residences;
+        for (const residence of residences) {
+            await this.page.goto(residence.link);
+            await this.page.waitForSelector(this.RESERVATION_LINK_SELECTOR);
+            const reservationLink = await this.page.$$eval(
+                this.RESERVATION_LINK_SELECTOR,
+                (links) => links[0].href
+            );
+            const splitLink = reservationLink.split("/");
+            const tmpId = splitLink[splitLink.length - 2]; // TODO: Maybe store it
+            const id = (
+                await Utils.fetchJson(
+                    `https://admin.arpej.fr/api/customer/residences/${tmpId}`,
+                    this.TOKEN
+                )
+            ).id;
+
+            const offers = await Utils.fetchJson(
+                `https://admin.arpej.fr/api/customer/residences/${id}/availabilities/2022-02/offers`,
+                this.TOKEN
+            );
+
+            console.log(`${offers.length} ${residence.title}`);
+        }
+    }
+}
+
