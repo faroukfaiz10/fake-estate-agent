@@ -9,9 +9,9 @@ const main = async () => {
     const crous = new Crous(await browser.newPage(), discord);
     const arpej = new Arpej(await browser.newPage(), discord);
     setInterval(async () => {
-        // await crous.fetch();
+        await crous.fetch();
         await arpej.fetch();
-    }, 1000 * 5);
+    }, 1000 * 60);
 };
 
 main();

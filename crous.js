@@ -1,8 +1,7 @@
 import { Utils } from "./utils.js";
 
 export class Crous {
-    NO_AVAILAVILITIES_MESSAGE =
-        "Aucun logement disponible pour vos critères.";
+    NO_AVAILAVILITIES_MESSAGE = "Aucun logement disponible pour vos critères.";
     URL =
         "https://trouverunlogement.lescrous.fr/tools/flow/21/search?bounds=2.2431_48.9244_2.4345_48.7714";
 
@@ -14,12 +13,12 @@ export class Crous {
 
     async fetch() {
         await this.page.goto(this.URL);
-        const unfilteredResidences = await this.getUnfilteredResidences();
-        const residences = await Utils.asyncFilter(
-            unfilteredResidences,
+        const residences = await this.getUnfilteredResidences();
+        const filteredresidences = await Utils.asyncFilter(
+            residences,
             async (residence) => await this.isResidenceAvailable(residence.id)
         );
-        this.handleNotification(residences);
+        this.handleNotification(filteredresidences);
     }
 
     async getUnfilteredResidences() {
