@@ -10,6 +10,10 @@ export class Utils{
         return s.size == arr1.length && s.size == arr2.length;
     }
 
+    static includes(arr1, arr2) {
+        return !arr2.some(x => !arr1.includes(x))
+    }
+
     static fetchJson = async (url, token) => {
         const response = token
             ? await fetch(url, { headers: { Authorization: `Bearer ${token}` } })

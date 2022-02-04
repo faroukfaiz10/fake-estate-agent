@@ -12,6 +12,8 @@ const main = async () => {
         await crous.fetch();
         await arpej.fetch();
     }, 1000 * 60);
+    // await crous.fetch();
+    // crous.makeReservation(340); // TODO: Test with a residence in Paris instead to avoid ban
 };
 
 main();
