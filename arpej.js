@@ -1,7 +1,7 @@
 import { Utils } from "./utils.js";
 
 export class Arpej {
-    TOKEN = "cbdd386fc36735d87184ee603b5b85f5526189f55a3ee3c3a42d740c421f54aa";
+    TOKEN = "9074c1048b5c81c5305c64dcb1b0cf6e5999b6d5c1a3db045db78eca2ef2641c"; // Expires in one week
     GET_RESIDENCES_URL =
         "https://www.arpej.fr/wp-json/sn/residences?lang=fr&display=map&related_city[]=52524&price_from=0&price_to=1000&show_if_full=false&show_if_colocations=false";
     RESERVATION_LINK_SELECTOR = "a[href^='https://ibail.arpej.fr/residences/']";
@@ -18,14 +18,14 @@ export class Arpej {
         "https://www.arpej.fr/fr/residence/carmen-caron-residence-etudiante-aubervilliers/",
         "https://www.arpej.fr/fr/residence/cite-de-la-musique-residence-etudiante-paris/",
         "https://www.arpej.fr/fr/residence/du-conservatoire-residence-etudiante-paris/",
-        "https://www.arpej.fr/fr/residence/les-bords-de-seine-residence-etudiante-alfortville/",
+        // "https://www.arpej.fr/fr/residence/les-bords-de-seine-residence-etudiante-alfortville/",
         "https://www.arpej.fr/fr/residence/nicolas-appert-residence-etudiante-ivry-sur-seine/",
         "https://www.arpej.fr/fr/residence/pierre-gilles-de-gennes-residence-etudiante-villejuif/",
         "https://www.arpej.fr/fr/residence/jacques-henri-lartigue-residence-etudiante-courbevoie/",
         "https://www.arpej.fr/fr/residence/chanzy-residence-etudiante-nanterre/",
         "https://www.arpej.fr/fr/residence/camille-see-residence-etudiante-saint-denis/",
         "https://www.arpej.fr/fr/residence/residence-etudiante-george-sand-saint-denis/",
-        "https://www.arpej.fr/fr/residence/alpha-residence-etudiante-aubervilliers/",
+        // "https://www.arpej.fr/fr/residence/alpha-residence-etudiante-aubervilliers/",
         "https://www.arpej.fr/fr/residence/omega-residence-etudiante-aubervilliers/",
         "https://www.arpej.fr/fr/residence/etudiante-pierre-vidal-naquet-saint-denis/",
     ];
@@ -36,7 +36,7 @@ export class Arpej {
         this.last_residences_ids = [];
     }
 
-    async fetch() {
+    async fetchAvailabilities() {
         const residences = (await Utils.fetchJson(this.GET_RESIDENCES_URL))
             .residences;
         const filteredResidences = residences.filter((residence) =>
