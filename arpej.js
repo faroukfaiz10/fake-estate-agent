@@ -1,7 +1,8 @@
+import "dotenv/config";
 import { Utils } from "./utils.js";
 
+
 export class Arpej {
-    TOKEN = "9074c1048b5c81c5305c64dcb1b0cf6e5999b6d5c1a3db045db78eca2ef2641c"; // Expires in one week
     GET_RESIDENCES_URL =
         "https://www.arpej.fr/wp-json/sn/residences?lang=fr&display=map&related_city[]=52524&price_from=0&price_to=1000&show_if_full=false&show_if_colocations=false";
     RESERVATION_LINK_SELECTOR = "a[href^='https://ibail.arpej.fr/residences/']";
@@ -55,7 +56,7 @@ export class Arpej {
             const id = (
                 await Utils.fetchJson(
                     `https://admin.arpej.fr/api/customer/residences/${tmpId}`,
-                    this.TOKEN
+                    process.env.ARPEJ_TOKEN
                 )
             ).id;
 
@@ -70,12 +71,12 @@ export class Arpej {
     async isResidenceAvailable(residenceId) {
         const februaryOffers = await Utils.fetchJson(
             `https://admin.arpej.fr/api/customer/residences/${residenceId}/availabilities/2022-02/offers`,
-            this.TOKEN
+            process.env.ARPEJ_TOKEN
         );
 
         const marchOffers = await Utils.fetchJson(
             `https://admin.arpej.fr/api/customer/residences/${residenceId}/availabilities/2022-03/offers`,
-            this.TOKEN
+            process.env.ARPEJ_TOKEN
         );
 
         const offers = februaryOffers.concat(marchOffers);
