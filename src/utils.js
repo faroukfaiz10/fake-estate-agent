@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-export class Utils{
+export class Utils {
     static async asyncFilter(arr, predicate) {
         const results = await Promise.all(arr.map(predicate));
         return arr.filter((_v, index) => results[index]);
@@ -11,12 +11,14 @@ export class Utils{
     }
 
     static includes(arr1, arr2) {
-        return !arr2.some(x => !arr1.includes(x))
+        return !arr2.some((x) => !arr1.includes(x));
     }
 
     static fetchJson = async (url, token) => {
         const response = token
-            ? await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+            ? await fetch(url, {
+                  headers: { Authorization: `Bearer ${token}` },
+              })
             : await fetch(url);
         return await response.json();
     };

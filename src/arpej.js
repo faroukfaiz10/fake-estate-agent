@@ -1,7 +1,6 @@
 import "dotenv/config";
 import { Utils } from "./utils.js";
 
-
 export class Arpej {
     GET_RESIDENCES_URL =
         "https://www.arpej.fr/wp-json/sn/residences?lang=fr&display=map&related_city[]=52524&price_from=0&price_to=1000&show_if_full=false&show_if_colocations=false";
@@ -60,7 +59,7 @@ export class Arpej {
                 )
             ).id;
 
-            if (await this.isResidenceAvailable(id)){
+            if (await this.isResidenceAvailable(id)) {
                 availableResidences.push(residence);
             }
         }
