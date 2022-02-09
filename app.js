@@ -9,9 +9,10 @@ const main = async () => {
     const crous = new Crous(await browser.newPage(), discord);
     const arpej = new Arpej(await browser.newPage(), discord);
     setInterval(async () => {
-        await arpej.fetchAvailabilities();
-        await crous.fetchAvailabilities();
+        await arpej.run();
+        await crous.run();
     }, 1000 * 60);
+    // await crous.bookResidence("id");
 };
 
 main();

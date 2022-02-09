@@ -36,7 +36,7 @@ export class Arpej {
         this.last_residences_ids = [];
     }
 
-    async fetchAvailabilities() {
+    async run() {
         const residences = (await Utils.fetchJson(this.GET_RESIDENCES_URL))
             .residences;
         const filteredResidences = residences.filter((residence) =>

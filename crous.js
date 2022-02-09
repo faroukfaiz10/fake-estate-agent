@@ -8,8 +8,7 @@ import "dotenv/config";
 export class Crous {
     NO_AVAILAVILITIES_MESSAGE = "Aucun logement disponible pour vos critères.";
     URL =
-        "https://trouverunlogement.lescrous.fr/tools/flow/21/search?bounds=-0.2545_50.7747_4.3872_47.0701&page=1&price=60000";
-        
+        "https://trouverunlogement.lescrous.fr/tools/flow/21/search?bounds=2.2431_48.9244_2.4345_48.7714";
     ENTRY_DATE = 17; // Day of february
 
     BLACKLIST = [
@@ -23,7 +22,7 @@ export class Crous {
         this.discordNotifier = discordNotifier;
     }
 
-    async fetchAvailabilities() {
+    async run() {
         await this.page.goto(this.URL);
         const residences = await this.getUnfilteredResidences();
         const filteredresidences = await Utils.asyncFilter(
@@ -33,18 +32,15 @@ export class Crous {
         const residenceToBook = filteredresidences.find(
             (residence) => !this.BLACKLIST.includes(residence.name)
         );
-        if (residenceToBook) {
-            console.log(
-                `Making reservation for residence ${residenceToBook.name} with id ${residenceToBook.id}`
-            );
-            const PHPSESSID = await this.getPHPSESSID();
-            console.log(`PHPSESSID=${PHPSESSID}`);
-            await this.addToSelection(residenceToBook.id, PHPSESSID);
-            console.log("Residence added to selection");
-            await this.makeReservation(residenceToBook.id, PHPSESSID);
-            console.log("Reservation made");
-        }
         this.handleNotification(filteredresidences);
+
+        if (!residenceToBook) {
+            return;
+        }
+        console.log(
+            `Making reservation for residence ${residenceToBook.name} with id ${residenceToBook.id}`
+        );
+        this.bookResidence(residenceToBook.id);
     }
 
     async getUnfilteredResidences() {
@@ -93,7 +89,17 @@ export class Crous {
     async isResidenceAvailable(id) {
         const URL = `https://trouverunlogement.lescrous.fr/api/fr/tools/21/accommodations/${id}/availabilities?occupationMode=alone&arrivalDate=2022-02-${this.ENTRY_DATE}&departureDate=2022-08-31`;
         const data = await Utils.fetchJson(URL);
-        return data.periodsAvailable.length != 0;
+        if (data.hasOwnProperty("errors")) {
+            // Added for this error:
+            // SOAP-ERROR: Parsing WSDL: Couldn't load from 'https://cite-u.crous-paris.fr/H3/ws/heberg3Service/2.8.0?wsdl'
+            console.log(
+                `Cannot get availabilities for residence with id ${id}!`
+            );
+        }
+        return (
+            data.hasOwnProperty("periodsAvailable") &&
+            data.periodsAvailable.length != 0
+        );
     }
 
     async addToSelection(residenceId, PHPSESSID) {
@@ -119,7 +125,16 @@ export class Crous {
         );
     }
 
-    async makeReservation(residenceId, PHPSESSID) {
+    async bookResidence(residenceId) {
+        const PHPSESSID = await this.getPHPSESSID();
+        console.log(`PHPSESSID=${PHPSESSID}`);
+        await this.addToSelection(residenceId, PHPSESSID);
+        console.log("Residence added to selection");
+        await this.bookSelectedResidence(residenceId, PHPSESSID);
+        console.log("Reservation made");
+    }
+
+    async bookSelectedResidence(residenceId, PHPSESSID) {
         const RESERVATION_URL = `https://trouverunlogement.lescrous.fr/tools/flow/21/cart/request/${residenceId}`;
         await this.page.goto(RESERVATION_URL);
 
@@ -204,7 +219,7 @@ export class Crous {
             {
                 headers: {
                     "content-type": "application/x-www-form-urlencoded",
-                    cookie: `JSESSIONID=${JSESSIONID}; IDP=${IDP}; _ga=GA1.3.911874446.1644260477; _gid=GA1.3.1797548863.1644260477; mselang=en_EN; _gat=1`,
+                    cookie: `JSESSIONID=${JSESSIONID}; IDP=${IDP};`,
                 },
                 body: `j_username=${encodeURIComponent(
                     process.env.EMAIL
@@ -235,7 +250,8 @@ export class Crous {
         );
 
         if (res4.headers.raw()["set-cookie"].length != 4) {
-            console.log("Assumed receiving 4 cookies");
+            // Once only received 3 cookies. Couldn't reproduce.
+            console.error("Assumed receiving 4 cookies");
         }
 
         const PHPSESSID = res4.headers
