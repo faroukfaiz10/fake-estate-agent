@@ -40,7 +40,7 @@ export class Crous {
         console.log(
             `Making reservation for residence ${residenceToBook.name} with id ${residenceToBook.id}`
         );
-        this.bookResidence(residenceToBook.id);
+        // this.bookResidence(residenceToBook.id);
     }
 
     async getUnfilteredResidences() {
@@ -130,7 +130,7 @@ export class Crous {
         console.log(`PHPSESSID=${PHPSESSID}`);
         await this.addToSelection(residenceId, PHPSESSID);
         console.log("Residence added to selection");
-        await this.bookSelectedResidence(residenceId, PHPSESSID);
+        // await this.bookSelectedResidence(residenceId, PHPSESSID);
         console.log("Reservation made");
     }
 
