@@ -27,16 +27,16 @@ export class Crous {
         const residences = await this.getUnfilteredResidences();
         const filteredresidences = await Utils.asyncFilter(
             residences,
-            async (residence) => await this.isResidenceAvailable(residence.id)
+            async (residence) =>
+                (await this.isResidenceAvailable(residence.id)) &&
+                !this.BLACKLIST.includes(residence.name)
         );
-        const residenceToBook = filteredresidences.find(
-            (residence) => !this.BLACKLIST.includes(residence.name)
-        );
-        this.handleNotification(filteredresidences);
-
-        if (!residenceToBook) {
+        if (!filteredresidences) {
             return;
         }
+        this.handleNotification(filteredresidences);
+
+        const residenceToBook = filteredresidences[0];
         console.log(
             `Making reservation for residence ${residenceToBook.name} with id ${residenceToBook.id}`
         );
