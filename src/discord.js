@@ -8,12 +8,12 @@ export class Discord {
             "https://discord.com/api/webhooks/936586097474035732/-at6PePUZXtep28ICJ2tBu4KIN4dSuQyGJNgYvk61IgagYMOh2W1rhwG7dqm-dxcvM4b";
         const AVARTAR_URL =
             "https://p7.hiclipart.com/preview/866/59/617/estate-agent-real-estate-computer-icons-house-property-house.jpg";
-        var payload = JSON.stringify({
+        const payload = JSON.stringify({
             username: "Fake estate agent",
             avatar_url: AVARTAR_URL,
             content: message,
         });
-        var params = {
+        const params = {
             headers: {
                 "Content-Type": "application/json",
             },

@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { Utils } from "./utils.js";
+import fetch from "node-fetch";
 
 export class Arpej {
     GET_RESIDENCES_URL =
@@ -36,6 +37,10 @@ export class Arpej {
         this.last_residences_ids = [];
     }
 
+    async init(){
+        this.token = await this.getToken();
+    }
+
     async run() {
         const residences = (await Utils.fetchJson(this.GET_RESIDENCES_URL))
             .residences;
@@ -55,7 +60,7 @@ export class Arpej {
             const id = (
                 await Utils.fetchJson(
                     `https://admin.arpej.fr/api/customer/residences/${tmpId}`,
-                    process.env.ARPEJ_TOKEN
+                    this.token
                 )
             ).id;
 
@@ -67,15 +72,29 @@ export class Arpej {
         this.handleNotification(availableResidences);
     }
 
+    async getToken() {
+        const body =
+            '{"client_id":"5d54af239945619afffa307db180badc712e9d315d3937296facc6fe01cefd4d","client_secret":"82b421e591bb4c158b41063cfd30a1133a7380d7a63a43ab15d084641449ddb4","grant_type":"client_credentials"}';
+        const res = await fetch("https://admin.arpej.fr/api/oauth/token", {
+            headers: {
+                "content-type": "application/json;charset=UTF-8",
+            },
+            body,
+            method: "POST",
+        });
+        const json = await res.json();
+        return json.access_token;
+    }
+
     async isResidenceAvailable(residenceId) {
         const februaryOffers = await Utils.fetchJson(
             `https://admin.arpej.fr/api/customer/residences/${residenceId}/availabilities/2022-02/offers`,
-            process.env.ARPEJ_TOKEN
+            this.token
         );
 
         const marchOffers = await Utils.fetchJson(
             `https://admin.arpej.fr/api/customer/residences/${residenceId}/availabilities/2022-03/offers`,
-            process.env.ARPEJ_TOKEN
+            this.token
         );
 
         const offers = februaryOffers.concat(marchOffers);

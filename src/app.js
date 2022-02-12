@@ -8,11 +8,13 @@ const main = async () => {
     const discord = new Discord();
     const crous = new Crous(await browser.newPage(), discord);
     const arpej = new Arpej(await browser.newPage(), discord);
-    setInterval(async () => {
-        await arpej.run();
-        await crous.run();
-    }, 1000 * 60);
+    await arpej.init()
+    // setInterval(async () => {
+    //     await arpej.run();
+    //     await crous.run();
+    // }, 1000 * 60);
     // await crous.bookResidence("id");
+    await arpej.run();
 };
 
 main();
