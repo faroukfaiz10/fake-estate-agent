@@ -7,8 +7,6 @@ import "dotenv/config";
 
 export class Crous {
     NO_AVAILAVILITIES_MESSAGE = "Aucun logement disponible pour vos critères.";
-    URL =
-        "https://trouverunlogement.lescrous.fr/tools/flow/21/search?bounds=2.2431_48.9244_2.4345_48.7714";
     ENTRY_DATE = 17; // Day of february
 
     BLACKLIST = [
@@ -23,7 +21,7 @@ export class Crous {
     }
 
     async run() {
-        await this.page.goto(this.URL);
+        await this.page.goto(process.env.CROUS_URL);
         const residences = await this.getUnfilteredResidences();
         const filteredresidences = await Utils.asyncFilter(
             residences,
@@ -37,10 +35,11 @@ export class Crous {
         this.handleNotification(filteredresidences);
 
         const residenceToBook = filteredresidences[0];
-        console.log(
-            `Making reservation for residence ${residenceToBook.name} with id ${residenceToBook.id}`
-        );
-        if (process.env.BOOK_CROUS == "true") {
+        if (residenceToBook && process.env.EMAIL && process.env.EMAIL) {
+            // If email and password are set, try to book the residence.
+            console.log(
+                `Making reservation for residence ${residenceToBook.name} with id ${residenceToBook.id}`
+            );
             this.bookResidence(residenceToBook.id);
         }
     }
@@ -163,19 +162,19 @@ export class Crous {
             accommodation: residenceId,
             "request_submit[pendingAttachments][1][attachmentId]": "1",
             "request_submit[pendingAttachments][1][file]": fs.createReadStream(
-                "documents/attestation_bancaire_bnp.pdf"
-            ),
+                "documents/justificatif_de_ressources.pdf"
+            ),  
             "request_submit[pendingAttachments][5][attachmentId]": "5",
             "request_submit[pendingAttachments][5][file]": fs.createReadStream(
                 "documents/certificat_de_scolarite.pdf"
             ),
             "request_submit[pendingAttachments][2][attachmentId]": "2",
             "request_submit[pendingAttachments][2][file]": fs.createReadStream(
-                "documents/attestation_de_reussite.pdf"
+                "documents/justificatif_de_niveau_d_etude.pdf"
             ),
             "request_submit[pendingAttachments][4][attachmentId]": "4",
             "request_submit[pendingAttachments][4][file]": fs.createReadStream(
-                "documents/convention_de_stage.pdf"
+                "documents/attestation_de_stage.pdf"
             ),
             "request_submit[studyLevel]": "5",
             "request_submit[purpose]": "internship",
@@ -220,7 +219,6 @@ export class Crous {
         const IDP = cookies2[1].split(";")[0].split("=")[1];
         const execution = headers2["location"][0].split("=")[2];
         const executionNum = execution.substring(1, execution.length - 2); // Assuming format eXs1.
-        console.log(`Execution number: ${executionNum}`);
 
         await fetch(
             `https://idp.messervices.etudiant.gouv.fr/idp/profile/SAML2/Redirect/SSO?execution=e${executionNum}s1`,

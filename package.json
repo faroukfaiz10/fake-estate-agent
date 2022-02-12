@@ -5,7 +5,9 @@
   "main": "src/app.js",
   "type": "module",
   "scripts": {
-    "start": "node src/app.js",
+    "start": "node src/app.js crous arpej",
+    "crous": "node src/app.js crous",
+    "arpej": "node src/app.js arpej",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

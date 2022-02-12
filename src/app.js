@@ -6,12 +6,20 @@ import { Discord } from "./discord.js";
 const main = async () => {
     const browser = await puppeteer.launch();
     const discord = new Discord();
-    const crous = new Crous(await browser.newPage(), discord);
-    const arpej = new Arpej(await browser.newPage(), discord);
-    await arpej.init()
+    const runCrous = process.argv.includes("crous");
+    const runArpej = process.argv.includes("arpej");
+    let crous, arpej;
+
+    if (runCrous) {
+        crous = new Crous(await browser.newPage(), discord);
+    }
+    if (runArpej) {
+        arpej = new Arpej(await browser.newPage(), discord);
+        await arpej.init();
+    }
     setInterval(async () => {
-        await arpej.run();
-        await crous.run();
+        if (runCrous) crous.run();
+        if (runArpej) arpej.run();
     }, 1000 * 60);
 };
 
