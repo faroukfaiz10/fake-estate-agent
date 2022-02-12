@@ -3,8 +3,6 @@ import { Utils } from "./utils.js";
 import fetch from "node-fetch";
 
 export class Arpej {
-    GET_RESIDENCES_URL =
-        "https://www.arpej.fr/wp-json/sn/residences?lang=fr&display=map&related_city[]=52524&price_from=0&price_to=1000&show_if_full=false&show_if_colocations=false";
     RESERVATION_LINK_SELECTOR = "a[href^='https://ibail.arpej.fr/residences/']";
 
     WHITELIST = [
@@ -37,16 +35,19 @@ export class Arpej {
         this.last_residences_ids = [];
     }
 
-    async init(){
+    async init() {
         this.token = await this.getToken();
     }
 
     async run() {
-        const residences = (await Utils.fetchJson(this.GET_RESIDENCES_URL))
+        const residences = (await Utils.fetchJson(process.env.ARPEJ_URL))
             .residences;
-        const filteredResidences = residences.filter((residence) =>
-            this.WHITELIST.includes(residence.link)
-        );
+        const filteredResidences =
+            process.env.USE_ARPEJ_WHITELIST == "true"
+                ? residences.filter((residence) =>
+                      this.WHITELIST.includes(residence.link)
+                  )
+                : residences;
         const availableResidences = [];
         for (const residence of filteredResidences) {
             await this.page.goto(residence.link);

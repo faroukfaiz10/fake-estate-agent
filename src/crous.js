@@ -40,7 +40,9 @@ export class Crous {
         console.log(
             `Making reservation for residence ${residenceToBook.name} with id ${residenceToBook.id}`
         );
-        this.bookResidence(residenceToBook.id);
+        if (process.env.BOOK_CROUS == "true") {
+            this.bookResidence(residenceToBook.id);
+        }
     }
 
     async getUnfilteredResidences() {
@@ -102,6 +104,19 @@ export class Crous {
         );
     }
 
+    async getCartId(PHPSESSID) {
+        const res = await fetch(
+            "https://trouverunlogement.lescrous.fr/api/fr/tools/21/carts",
+            {
+                headers: {
+                    cookie: `PHPSESSID=${PHPSESSID}`,
+                },
+            }
+        );
+        const json = await res.json();
+        return json.id
+    }
+
     async addToSelection(residenceId, PHPSESSID) {
         const body = JSON.stringify({
             accommodation: residenceId,
@@ -112,8 +127,10 @@ export class Crous {
             selectedDepartureDate: "2022-08-31T00:00:00+02:00",
         });
 
+        const cartId = await getCartId(PHPSESSID);
+
         await fetch(
-            `https://trouverunlogement.lescrous.fr/api/fr/tools/21/carts/${process.env.CART_NUMBER}/items`,
+            `https://trouverunlogement.lescrous.fr/api/fr/tools/21/carts/${cartId}/items`,
 
             {
                 headers: {
