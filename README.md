@@ -1,5 +1,5 @@
 
-# crous-arpej
+# fake-estate-agent
 The project is a bot that checks for housing in Crous and Arpej residences, which are known to be the hardest to get in France, especially in Paris. 
 For the Crous which is more challenging to get, as housing disappears as soon as it shows up, the bot can do the reservation for you.
 
